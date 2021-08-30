@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ударь крота</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1><span>Score</span> <span class="score">0</span>   </h1>
+    <button onclick="startRound()">Start!</button>
+    <button class="clear-button" onclick="clearStorage()">Start over</button>
+    <audio src="png/mouth_foley_puff_09.mp3"></audio>
+    <div class="game-space">
+        <div class="hole">
+            <div class="mole mole1"></div>
+        </div>
+        <div class="hole">
+            <div class="mole mole2"></div>
+        </div>
+        <div class="hole">
+            <div class="mole mole3"></div>
+        </div>
+        <div class="hole">
+            <div class="mole mole4"></div>
+        </div>
+        <div class="hole">
+            <div class="mole mole5"></div>
+        </div>
+        <div class="hole">
+            <div class="mole mole6"></div>
+        </div>                
+    </div>
+
+    <script>
+        
+        let previosMole;
+        let score = 0;
+        myStorage = window.localStorage;
+        score = myStorage.getItem('score');
+        let timeIsUp = true;
+        let min = 400;
+        let max = 1200;
+        let scoreVisual = document.querySelector('.score') ;
+        scoreVisual.textContent = score;
+        let moles = document.querySelectorAll ('.mole')
+        
+
+
+        function randTime (min, max) {
+            let time = Math.round(Math.random() * (max - min) + min);
+            return time;
+        }
+
+        
+        function randMole () {
+            
+            let idx = Math.ceil(Math.random() * 6);
+            let selectedMole = document.querySelector(`.mole${idx}`);
+            
+            return selectedMole;
+        }
+
+        function appear (min, max) {
+            var randMol = randMole();
+            if(randMol == previosMole) {
+                randMol = randMole()
+            }
+            
+            
+            if (previosMole == undefined  || previosMole.style.display != 'display' ) {
+                var peep = randMol.style.display = 'block';
+                previosMole = randMol;
+                setTimeout(() => { randMol.style.display = 'none'}, randTime(min, max));
+            }
+            
+            
+        }
+
+        function startRound () {
+            if(timeIsUp == false) return;
+            timeIsUp = false;
+            round = setInterval(() => {if (!timeIsUp) appear (min, max)}, randTime(min, max)+1000 );
+            setTimeout(() => {timeIsUp = true}, 10000);
+            min = min * 0.9;
+            max = max * 0.9;
+        }
+
+        function bonk (e) {
+            if(!e.isTrusted) return;
+            this.style.display = 'none';
+            let audio = new Audio("png/mouth_foley_puff_09.mp3")
+            audio.play()
+            score++;
+            scoreVisual.textContent = score;
+            myStorage.setItem('score', score);
+            
+        }
+
+        moles.forEach(mole => mole.addEventListener('click', bonk))
+        
+        
+        
+        function clearStorage() {
+            myStorage.setItem('score', 0);
+            location.reload()
+        }
+
+        
+
+            
+            
+
+
+
+
+
+
+        /*
+        let mole = document.querySelector('.mole1');
+
+        let peep = setInterval(()=> mole.style.display = 'block', 1000)
+
+        setTimeout(() => {clearInterval(peep); mole.style.display = 'none'}, 3000)
+        */
+
+
+
+
+    </script>
+</body>
+</html>
